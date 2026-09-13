@@ -1,0 +1,14 @@
+{
+  "name": "posto-argb-control",
+  "version": "0.1.0",
+  "description": "Posto ARGB Control",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder"
+  },
+  "devDependencies": {
+    "electron": "latest",
+    "electron-builder": "latest"
+  }
+}

@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Posto ARGB Control</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Segoe UI,Arial,sans-serif;background:#0b1020;color:#e8eefc}
+.app{display:grid;grid-template-columns:250px 1fr;min-height:100vh}.side{background:#10182c;padding:24px;border-right:1px solid #24304b}
+.logo{font-size:22px;font-weight:800;margin-bottom:30px}.logo span{color:#35d0ff}
+.nav{display:grid;gap:8px}.nav button{background:transparent;color:#aebbd5;border:0;text-align:left;padding:12px;border-radius:10px;font-size:15px;cursor:pointer}.nav button.active,.nav button:hover{background:#1c2945;color:#fff}
+.main{padding:28px;max-width:1250px;width:100%;margin:auto}.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px}.top h1{margin:0}.badge{padding:8px 12px;border-radius:20px;background:#123d2d;color:#69f0a9;font-size:13px}
+.grid{display:grid;grid-template-columns:1.2fr .8fr;gap:18px}.card{background:#111a2f;border:1px solid #263452;border-radius:16px;padding:20px;box-shadow:0 10px 30px #0002}.card h2{margin:0 0 18px;font-size:17px}
+.preview{height:260px;border-radius:14px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#ff003c,#ff9d00,#fff000,#00e676,#00b7ff,#7c4dff,#ff00a8);background-size:400% 400%;animation:rainbow 6s linear infinite;box-shadow:0 0 35px #00b7ff55}
+.preview.off{background:#080b12;animation:none;box-shadow:none}.led{width:100px;height:100px;border-radius:50%;background:#fff;box-shadow:0 0 50px #fff;opacity:.9}
+@keyframes rainbow{0%{background-position:0 50%}100%{background-position:400% 50%}}
+label{display:block;margin:15px 0 7px;color:#aebbd5;font-size:13px}select,input[type=color]{width:100%;height:42px;border-radius:9px;border:1px solid #31405f;background:#0b1222;color:#fff;padding:8px}
+input[type=range]{width:100%}.row{display:grid;grid-template-columns:1fr 1fr;gap:14px}.value{float:right;color:#fff}
+.buttons{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}button.action{border:0;border-radius:9px;padding:11px 15px;font-weight:700;cursor:pointer;background:#247cff;color:#fff}button.secondary{background:#253452}.presets{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.preset{height:70px;border:1px solid #31405f;border-radius:10px;cursor:pointer;color:#fff;font-weight:700;background:#18233a}
+.status{margin-top:14px;padding:11px;border-radius:9px;background:#0d1526;color:#8fa2c4;font-size:13px}.hardware{display:grid;gap:10px}.hw{padding:14px;border:1px solid #293858;border-radius:10px;background:#0d1526}.hw b{display:block;margin-bottom:4px}.ok{color:#69f0a9}.warn{color:#ffd166}
+@media(max-width:850px){.app{grid-template-columns:1fr}.side{display:none}.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="side">
+  <div class="logo">POSTO <span>ARGB</span></div>
+  <div class="nav">
+    <button class="active">🎨 Iluminação</button>
+    <button onclick="alert('Perfis: em breve')">💾 Perfis</button>
+    <button onclick="alert('Monitoramento: em breve')">📊 Monitoramento</button>
+    <button onclick="alert('Configurações: em breve')">⚙️ Configurações</button>
+  </div>
+</aside>
+<main class="main">
+  <div class="top"><h1>Controle ARGB</h1><div class="badge" id="connection">● Modo demonstração</div></div>
+  <div class="grid">
+    <section class="card">
+      <h2>Visualização</h2>
+      <div class="preview" id="preview"><div class="led"></div></div>
+      <div class="row">
+        <div><label>Efeito</label><select id="effect" onchange="applyEffect()">
+          <option value="rainbow">Rainbow</option><option value="static">Cor fixa</option><option value="breathing">Respiração</option><option value="wave">Onda</option><option value="off">Desligado</option>
+        </select></div>
+        <div><label>Cor</label><input id="color" type="color" value="#00b7ff" onchange="applyEffect()"></div>
+      </div>
+      <label>Brilho <span class="value" id="brightnessValue">80%</span></label>
+      <input id="brightness" type="range" min="0" max="100" value="80" oninput="brightnessValue.textContent=this.value+'%'">
+      <label>Velocidade <span class="value" id="speedValue">50%</span></label>
+      <input id="speed" type="range" min="0" max="100" value="50" oninput="speedValue.textContent=this.value+'%'">
+      <div class="buttons">
+        <button class="action" onclick="applyEffect()">Aplicar</button>
+        <button class="action secondary" onclick="turnOff()">Desligar LEDs</button>
+      </div>
+      <div class="status" id="status">Configuração alterada localmente. A integração física será feita na próxima etapa.</div>
+    </section>
+
+    <section class="card">
+      <h2>Hardware</h2>
+      <div class="hardware">
+        <div class="hw"><b>ARGB 5V 3 pinos</b><span class="warn">● Aguardando controlador</span></div>
+        <div class="hw"><b>Placa-mãe</b><span class="ok">● Interface preparada</span></div>
+        <div class="hw"><b>Controladora USB</b><span class="warn">● Não detectada</span></div>
+      </div>
+      <h2 style="margin-top:24px">Presets</h2>
+      <div class="presets">
+        <button class="preset" onclick="preset('#ff2020','static')">🔴 Vermelho</button>
+        <button class="preset" onclick="preset('#2080ff','static')">🔵 Azul</button>
+        <button class="preset" onclick="preset('#ffffff','static')">⚪ Branco</button>
+        <button class="preset" onclick="preset('#00ff88','breathing')">🟢 Respiração</button>
+        <button class="preset" onclick="preset('#00b7ff','wave')">🌊 Onda</button>
+        <button class="preset" onclick="preset('#00b7ff','rainbow')">🌈 Rainbow</button>
+      </div>
+    </section>
+  </div>
+</main>
+</div>
+<script>
+const preview=document.getElementById('preview'), color=document.getElementById('color'), effect=document.getElementById('effect');
+function applyEffect(){
+  const e=effect.value,c=color.value;
+  preview.className='preview '+(e==='off'?'off':'');
+  preview.style.animation = e==='rainbow' ? 'rainbow 6s linear infinite' : e==='breathing' ? 'breathe 2s ease-in-out infinite' : e==='wave' ? 'rainbow 2s linear infinite' : 'none';
+  preview.style.background = e==='static' ? c : '';
+  document.getElementById('status').textContent=`Efeito "${e}" aplicado. Cor ${c}.`;
+}
+function turnOff(){effect.value='off';preview.className='preview off';preview.style.animation='none';document.getElementById('status').textContent='LEDs desligados.'}
+function preset(c,e){color.value=c;effect.value=e;applyEffect()}
+const s=document.createElement('style');s.textContent='@keyframes breathe{0%,100%{opacity:.25}50%{opacity:1}}';document.head.appendChild(s);
+applyEffect();
+</script>
+</body>
+</html>
