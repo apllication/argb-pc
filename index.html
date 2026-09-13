@@ -1,93 +1,42 @@
 <!doctype html>
 <html lang="pt-BR">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Posto ARGB Control</title>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Posto ARGB Control v0.3</title>
 <style>
-*{box-sizing:border-box}body{margin:0;font-family:Segoe UI,Arial,sans-serif;background:#0b1020;color:#e8eefc}
-.app{display:grid;grid-template-columns:250px 1fr;min-height:100vh}.side{background:#10182c;padding:24px;border-right:1px solid #24304b}
-.logo{font-size:22px;font-weight:800;margin-bottom:30px}.logo span{color:#35d0ff}
-.nav{display:grid;gap:8px}.nav button{background:transparent;color:#aebbd5;border:0;text-align:left;padding:12px;border-radius:10px;font-size:15px;cursor:pointer}.nav button.active,.nav button:hover{background:#1c2945;color:#fff}
-.main{padding:28px;max-width:1250px;width:100%;margin:auto}.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px}.top h1{margin:0}.badge{padding:8px 12px;border-radius:20px;background:#123d2d;color:#69f0a9;font-size:13px}
-.grid{display:grid;grid-template-columns:1.2fr .8fr;gap:18px}.card{background:#111a2f;border:1px solid #263452;border-radius:16px;padding:20px;box-shadow:0 10px 30px #0002}.card h2{margin:0 0 18px;font-size:17px}
-.preview{height:260px;border-radius:14px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#ff003c,#ff9d00,#fff000,#00e676,#00b7ff,#7c4dff,#ff00a8);background-size:400% 400%;animation:rainbow 6s linear infinite;box-shadow:0 0 35px #00b7ff55}
-.preview.off{background:#080b12;animation:none;box-shadow:none}.led{width:100px;height:100px;border-radius:50%;background:#fff;box-shadow:0 0 50px #fff;opacity:.9}
-@keyframes rainbow{0%{background-position:0 50%}100%{background-position:400% 50%}}
-label{display:block;margin:15px 0 7px;color:#aebbd5;font-size:13px}select,input[type=color]{width:100%;height:42px;border-radius:9px;border:1px solid #31405f;background:#0b1222;color:#fff;padding:8px}
-input[type=range]{width:100%}.row{display:grid;grid-template-columns:1fr 1fr;gap:14px}.value{float:right;color:#fff}
-.buttons{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}button.action{border:0;border-radius:9px;padding:11px 15px;font-weight:700;cursor:pointer;background:#247cff;color:#fff}button.secondary{background:#253452}.presets{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.preset{height:70px;border:1px solid #31405f;border-radius:10px;cursor:pointer;color:#fff;font-weight:700;background:#18233a}
-.status{margin-top:14px;padding:11px;border-radius:9px;background:#0d1526;color:#8fa2c4;font-size:13px}.hardware{display:grid;gap:10px}.hw{padding:14px;border:1px solid #293858;border-radius:10px;background:#0d1526}.hw b{display:block;margin-bottom:4px}.ok{color:#69f0a9}.warn{color:#ffd166}
-@media(max-width:850px){.app{grid-template-columns:1fr}.side{display:none}.grid{grid-template-columns:1fr}}
+:root{--bg:#0b0e13;--panel:#121720;--panel2:#181f2a;--line:#293241;--text:#edf2f7;--muted:#94a3b8;--accent:#59a7ff;--ok:#45d483;--danger:#ff5d6c}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 70% 0,#17243b 0,#0b0e13 42%);color:var(--text);font:14px "Segoe UI",Arial,sans-serif}.app{display:grid;grid-template-columns:220px 1fr;min-height:100vh}.side{background:#0b0f15;border-right:1px solid var(--line);padding:22px 14px;position:relative}.brand{font-size:19px;font-weight:800;margin:4px 10px 26px}.brand span{color:#61b3ff}.nav button{width:100%;padding:12px 13px;margin:3px 0;border:0;border-radius:9px;background:transparent;color:#aeb9c8;text-align:left;cursor:pointer}.nav button.active,.nav button:hover{background:#1b2533;color:#fff}.status{position:absolute;bottom:18px;left:20px;color:#7f8da1;font-size:12px}.main{padding:28px 32px;max-width:1300px;width:100%;margin:auto}.top{display:flex;justify-content:space-between;gap:20px;align-items:flex-start}.title h1{margin:0 0 5px;font-size:27px}.title p{margin:0;color:var(--muted)}.actions{display:flex;gap:8px}.btn{border:1px solid var(--line);background:#151d28;color:#fff;border-radius:8px;padding:10px 14px;cursor:pointer}.btn.primary{background:#2d79c7;border-color:#3d8ddd}.btn.danger{background:#54232b;border-color:#78333e}.grid{display:grid;grid-template-columns:1.5fr 1fr;gap:18px;margin-top:22px}.card{background:rgba(18,23,32,.94);border:1px solid var(--line);border-radius:13px;padding:18px}.card h2{font-size:15px;margin:0 0 15px}.preview{height:245px;border-radius:11px;border:1px solid #344052;display:flex;align-items:center;justify-content:center;overflow:hidden;background:#06080b;position:relative}.ledbar{height:74px;width:82%;border-radius:18px;filter:blur(8px);opacity:.9;background:linear-gradient(90deg,#ff0000,#ffeb00,#00ff80,#00b7ff,#7b42ff,#ff00a8,#ff0000);background-size:300% 100%;animation:rainbow 4s linear infinite}.preview.off .ledbar{background:#20252d;animation:none;filter:none;opacity:.35}@keyframes rainbow{to{background-position:300% 0}}.controls{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:15px}.control label{display:flex;justify-content:space-between;color:#b7c2d0;margin-bottom:7px}.control select,.control input[type=text],.control input[type=number]{width:100%;background:#0e141c;color:#fff;border:1px solid var(--line);border-radius:7px;padding:9px}.range{width:100%}.colorrow{display:flex;align-items:center;gap:10px}.colorrow input{width:52px;height:36px;border:0;background:none;padding:0}.presets{display:flex;flex-wrap:wrap;gap:7px;margin-top:15px}.preset{padding:7px 10px;border:1px solid var(--line);background:#111822;color:#d9e2ec;border-radius:7px;cursor:pointer}.device{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:13px;border:1px solid var(--line);border-radius:9px;background:#10161f;margin-bottom:9px}.device small{display:block;color:var(--muted);margin-top:4px}.pill{font-size:11px;padding:5px 8px;border-radius:999px;background:#26303d;color:#aebdce;white-space:nowrap}.pill.ok{background:#153b2b;color:#6ee7a1}.pill.warn{background:#46361c;color:#f5c66e}.wide{grid-column:1/-1}.log{background:#0a0e14;border:1px solid var(--line);border-radius:8px;padding:10px;min-height:90px;max-height:150px;overflow:auto;color:#9fb0c4;font:12px Consolas,monospace}.hint{color:#8897aa;font-size:12px;line-height:1.5}.hidden{display:none}.zones{display:grid;grid-template-columns:1fr 1fr;gap:8px}.zone{padding:10px;border:1px solid var(--line);border-radius:8px;background:#0e141c}.zone b{display:block}.zone span{color:var(--muted);font-size:12px}.target{margin-bottom:14px}.target select{width:100%;background:#0e141c;color:#fff;border:1px solid var(--line);border-radius:7px;padding:10px}.meta{display:grid;grid-template-columns:1fr 1fr;gap:8px}.meta div{padding:9px;background:#0e141c;border:1px solid var(--line);border-radius:8px}.meta small{display:block;color:var(--muted)}
+@keyframes breathe{0%,100%{opacity:.15}50%{opacity:1}}@keyframes wave{0%{transform:translateX(-20%)}50%{transform:translateX(20%)}100%{transform:translateX(-20%)}}
+@media(max-width:900px){.app{grid-template-columns:1fr}.side{display:none}.grid{grid-template-columns:1fr}.wide{grid-column:auto}.main{padding:20px}.controls{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
-<div class="app">
-<aside class="side">
-  <div class="logo">POSTO <span>ARGB</span></div>
-  <div class="nav">
-    <button class="active">🎨 Iluminação</button>
-    <button onclick="alert('Perfis: em breve')">💾 Perfis</button>
-    <button onclick="alert('Monitoramento: em breve')">📊 Monitoramento</button>
-    <button onclick="alert('Configurações: em breve')">⚙️ Configurações</button>
-  </div>
-</aside>
+<div class="app"><aside class="side"><div class="brand">⚡ Posto <span>ARGB</span></div><div class="nav"><button class="active" data-page="light">💡 Iluminação</button><button data-page="profiles">💾 Perfis</button><button data-page="hardware">🧩 Hardware</button><button data-page="settings">⚙ Configurações</button></div><div class="status">v0.3 • OpenRGB SDK</div></aside>
 <main class="main">
-  <div class="top"><h1>Controle ARGB</h1><div class="badge" id="connection">● Modo demonstração</div></div>
-  <div class="grid">
-    <section class="card">
-      <h2>Visualização</h2>
-      <div class="preview" id="preview"><div class="led"></div></div>
-      <div class="row">
-        <div><label>Efeito</label><select id="effect" onchange="applyEffect()">
-          <option value="rainbow">Rainbow</option><option value="static">Cor fixa</option><option value="breathing">Respiração</option><option value="wave">Onda</option><option value="off">Desligado</option>
-        </select></div>
-        <div><label>Cor</label><input id="color" type="color" value="#00b7ff" onchange="applyEffect()"></div>
-      </div>
-      <label>Brilho <span class="value" id="brightnessValue">80%</span></label>
-      <input id="brightness" type="range" min="0" max="100" value="80" oninput="brightnessValue.textContent=this.value+'%'">
-      <label>Velocidade <span class="value" id="speedValue">50%</span></label>
-      <input id="speed" type="range" min="0" max="100" value="50" oninput="speedValue.textContent=this.value+'%'">
-      <div class="buttons">
-        <button class="action" onclick="applyEffect()">Aplicar</button>
-        <button class="action secondary" onclick="turnOff()">Desligar LEDs</button>
-      </div>
-      <div class="status" id="status">Configuração alterada localmente. A integração física será feita na próxima etapa.</div>
-    </section>
-
-    <section class="card">
-      <h2>Hardware</h2>
-      <div class="hardware">
-        <div class="hw"><b>ARGB 5V 3 pinos</b><span class="warn">● Aguardando controlador</span></div>
-        <div class="hw"><b>Placa-mãe</b><span class="ok">● Interface preparada</span></div>
-        <div class="hw"><b>Controladora USB</b><span class="warn">● Não detectada</span></div>
-      </div>
-      <h2 style="margin-top:24px">Presets</h2>
-      <div class="presets">
-        <button class="preset" onclick="preset('#ff2020','static')">🔴 Vermelho</button>
-        <button class="preset" onclick="preset('#2080ff','static')">🔵 Azul</button>
-        <button class="preset" onclick="preset('#ffffff','static')">⚪ Branco</button>
-        <button class="preset" onclick="preset('#00ff88','breathing')">🟢 Respiração</button>
-        <button class="preset" onclick="preset('#00b7ff','wave')">🌊 Onda</button>
-        <button class="preset" onclick="preset('#00b7ff','rainbow')">🌈 Rainbow</button>
-      </div>
-    </section>
-  </div>
-</main>
-</div>
+<section id="page-light"><div class="top"><div class="title"><h1>Controle ARGB</h1><p>Controle real via OpenRGB • MSI MAG B550 TOMAHAWK / JRAINBOW</p></div><div class="actions"><button class="btn" id="detect">🔎 Detectar</button><button class="btn primary" id="apply">Aplicar</button><button class="btn danger" id="off">Desligar</button></div></div>
+<div class="grid">
+<div class="card"><h2>Pré-visualização</h2><div class="preview" id="preview"><div class="ledbar" id="ledbar"></div></div>
+<div class="controls"><div class="control target"><label>Controlador</label><select id="device"></select></div><div class="control"><label>Efeito <b id="effectLabel">Cor fixa</b></label><select id="effect"><option value="Cor fixa">Cor fixa</option></select></div><div class="control"><label>Cor</label><div class="colorrow"><input type="color" id="color" value="#00aaff"><span id="hex">#00AAFF</span></div></div><div class="control"><label>Brilho <b id="brightnessValue">100%</b></label><input class="range" id="brightness" type="range" min="0" max="100" value="100"></div><div class="control"><label>Velocidade <b id="speedValue">60%</b></label><input class="range" id="speed" type="range" min="0" max="100" value="60"></div></div>
+<div class="presets"><button class="preset" data-color="#ff0000">🔴 Vermelho</button><button class="preset" data-color="#0066ff">🔵 Azul</button><button class="preset" data-color="#ffffff">⚪ Branco</button><button class="preset" data-effect="Breathing">💨 Breathing</button><button class="preset" data-effect="Rainbow">🌈 Rainbow</button><button class="preset" data-effect="Cor fixa">◼ Cor fixa</button></div></div>
+<div class="card"><h2>OpenRGB / hardware detectado</h2><div id="devices"><div class="device"><div><b>Aguardando detecção</b><small>127.0.0.1:6742</small></div><span class="pill warn">Desconectado</span></div></div><div id="zones" class="zones"></div><div id="deviceMeta" class="meta" style="margin-top:10px"></div></div>
+<div class="card wide"><h2>Registro</h2><div class="log" id="log">[Posto ARGB] v0.3 iniciado.</div></div>
+</div></section>
+<section id="page-profiles" class="hidden"><div class="top"><div class="title"><h1>Perfis</h1><p>Salve configurações localmente.</p></div></div><div class="card" style="margin-top:22px"><div class="controls"><div class="control"><label>Nome do perfil</label><input id="profileName" type="text" placeholder="Ex.: Jogo"></div><div class="control" style="display:flex;align-items:end"><button class="btn primary" id="saveProfile">Salvar perfil</button></div></div><div id="profileList" style="margin-top:16px"></div></div></section>
+<section id="page-hardware" class="hidden"><div class="top"><div class="title"><h1>Hardware</h1><p>Topologia configurada para este projeto.</p></div></div><div class="grid"><div class="card"><h2>Placa-mãe</h2><div class="device"><div><b>MSI MAG B550 TOMAHAWK</b><small>MS-7C91 • Mystic Light / OpenRGB</small></div><span class="pill ok">Alvo</span></div></div><div class="card"><h2>Saídas ARGB</h2><div class="device"><div><b>JRAINBOW1</b><small>5V • 3 pinos • ARGB</small></div><span class="pill ok">5V</span></div><div class="device"><div><b>JRAINBOW2</b><small>5V • 3 pinos • ARGB</small></div><span class="pill ok">5V</span></div></div><div class="card wide"><h2>Controladora</h2><div class="device"><div><b>Cooler Master ARGB Controller</b><small>Sincronizada pela placa-mãe</small></div><span class="pill">Motherboard Sync</span></div><p class="hint">A comunicação do Posto ARGB passa pelo OpenRGB SDK. Não há escrita direta nos registradores da placa-mãe.</p><p class="hint"><b>Importante:</b> ARGB 5V/3 pinos deve permanecer em JRAINBOW. Não conecte ARGB 5V ao JRGB 12V/4 pinos.</p></div></div></section>
+<section id="page-settings" class="hidden"><div class="top"><div class="title"><h1>Configurações</h1><p>Ponte e comportamento do aplicativo.</p></div></div><div class="grid"><div class="card"><h2>Ponte RGB</h2><div class="device"><div><b>OpenRGB SDK</b><small>127.0.0.1:6742 • protocolo compatível até 5</small></div><span class="pill warn" id="bridgeState">Desconectado</span></div><p class="hint">O OpenRGB deve estar aberto com o servidor SDK ativado. O Posto negocia o protocolo suportado e lê os modos/zonas reais do controlador.</p></div><div class="card"><h2>Inicialização</h2><label style="display:flex;gap:10px;align-items:center"><input id="startup" type="checkbox"> Iniciar com o Windows</label></div></div></section>
+</main></div>
 <script>
-const preview=document.getElementById('preview'), color=document.getElementById('color'), effect=document.getElementById('effect');
-function applyEffect(){
-  const e=effect.value,c=color.value;
-  preview.className='preview '+(e==='off'?'off':'');
-  preview.style.animation = e==='rainbow' ? 'rainbow 6s linear infinite' : e==='breathing' ? 'breathe 2s ease-in-out infinite' : e==='wave' ? 'rainbow 2s linear infinite' : 'none';
-  preview.style.background = e==='static' ? c : '';
-  document.getElementById('status').textContent=`Efeito "${e}" aplicado. Cor ${c}.`;
-}
-function turnOff(){effect.value='off';preview.className='preview off';preview.style.animation='none';document.getElementById('status').textContent='LEDs desligados.'}
-function preset(c,e){color.value=c;effect.value=e;applyEffect()}
-const s=document.createElement('style');s.textContent='@keyframes breathe{0%,100%{opacity:.25}50%{opacity:1}}';document.head.appendChild(s);
-applyEffect();
-</script>
-</body>
-</html>
+const api=window.argbAPI,$=s=>document.querySelector(s),logEl=$('#log');let state={devices:[],result:null};
+function log(m){logEl.textContent+='\n'+new Date().toLocaleTimeString()+' '+m;logEl.scrollTop=logEl.scrollHeight}
+function hexToRgb(h){const n=parseInt(h.slice(1),16);return{r:n>>16&255,g:n>>8&255,b:n&255}}
+function rgbToHex(c){return '#'+[c.r,c.g,c.b].map(x=>x.toString(16).padStart(2,'0')).join('').toUpperCase()}
+function updatePreview(){const e=$('#effect').value,c=$('#color').value,b=Number($('#brightness').value)/100,s=Number($('#speed').value);$('#effectLabel').textContent=e;$('#hex').textContent=c.toUpperCase();$('#brightnessValue').textContent=Math.round(b*100)+'%';$('#speedValue').textContent=s+'%';const p=$('#preview'),bar=$('#ledbar');p.classList.toggle('off',e==='Desligado');bar.style.opacity=e==='Desligado'?.3:b;bar.style.animationDuration=Math.max(.6,5-s/100*4.4)+'s';if(e==='Cor fixa'||e==='Breathing'||e==='Onda'){bar.style.background=c;bar.style.backgroundSize='100% 100%'}else{bar.style.background='linear-gradient(90deg,#ff0000,#ffeb00,#00ff80,#00b7ff,#7b42ff,#ff00a8,#ff0000)';bar.style.backgroundSize='300% 100%'}bar.style.animationName=e==='Breathing'?'breathe':e==='Onda'?'wave':e==='Rainbow'?'rainbow':'none'}
+function fillEffects(d){const current=$('#effect').value;$('#effect').innerHTML='<option value="Cor fixa">Cor fixa</option>'+d.modes.map(m=>`<option value="${m.name.replace(/"/g,'&quot;')}">${m.name}</option>`).join('');if([...$('#effect').options].some(o=>o.value===current))$('#effect').value=current;else if(d.activeMode>=0&&d.modes[d.activeMode])$('#effect').value=d.modes[d.activeMode].name;updatePreview()}
+function renderDevices(){const sel=$('#device');sel.innerHTML=state.devices.map(d=>`<option value="${d.index}">${d.index}: ${d.name}${d.name.toUpperCase().includes('MSI MAG B550')?' • alvo':''}</option>`).join('');if(state.devices.length){const preferred=state.devices.find(d=>d.name.toUpperCase().includes('MSI MAG B550'));sel.value=String((preferred||state.devices[0]).index);renderSelected()}}
+function renderSelected(){const d=state.devices.find(x=>x.index===Number($('#device').value));if(!d)return;fillEffects(d);$('#zones').innerHTML=d.zones.map(z=>`<div class="zone"><b>${z.name}</b><span>${z.count} LEDs • min ${z.min} / max ${z.max}</span></div>`).join('');$('#deviceMeta').innerHTML=`<div><small>Fabricante</small>${d.vendor||'—'}</div><div><small>LEDs</small>${d.ledCount}</div><div><small>Protocolo</small>${state.result.protocol}</div><div><small>Local</small>${d.location||'—'}</div>`}
+async function detect(){log('Consultando OpenRGB SDK em 127.0.0.1:6742...');try{const r=await api.detect();state.result=r;state.devices=r.devices||[];$('#bridgeState').textContent=r.connected?`Conectado • v${r.protocol}`:'Desconectado';$('#bridgeState').className='pill '+(r.connected?'ok':'warn');if(!r.connected){$('#devices').innerHTML=`<div class="device"><div><b>OpenRGB não respondeu</b><small>${r.error||'Verifique o servidor SDK.'}</small></div><span class="pill warn">Offline</span></div>`;log('Falha: '+(r.error||'OpenRGB offline'));return}$('#devices').innerHTML=state.devices.map(d=>`<div class="device"><div><b>${d.name}</b><small>${d.vendor||'Sem fabricante'} • ${d.ledCount} LEDs • ${d.modes.length} modos</small></div><span class="pill ok">Detectado</span></div>`).join('');renderDevices();log(`OpenRGB conectado. ${state.devices.length} controlador(es), protocolo efetivo ${r.protocol}.`);if(r.serverProtocol>r.protocol)log(`Servidor anuncia protocolo ${r.serverProtocol}; usando ${r.protocol} para compatibilidade.`)}catch(e){log('Erro na detecção: '+e.message)}}
+$('#device').onchange=renderSelected;$('#detect').onclick=detect;$('#apply').onclick=async()=>{const cfg={deviceIndex:Number($('#device').value),effect:$('#effect').value,color:hexToRgb($('#color').value),brightness:Number($('#brightness').value),speed:Number($('#speed').value)};try{const r=await api.apply(cfg);log(r.ok?`Aplicado em ${r.device.name}.`:'Falha: '+(r.reason||r.error||'sem dispositivo'));if(!r.ok)alert(r.error||'Não foi possível aplicar.')}catch(e){log('Falha ao aplicar: '+e.message)}};$('#off').onclick=async()=>{try{const r=await api.apply({deviceIndex:Number($('#device').value),effect:'Desligado',color:{r:0,g:0,b:0},brightness:0,speed:50});log(r.ok?`ARGB desligado em ${r.device.name}.`:'Falha ao desligar.')}catch(e){log('Falha: '+e.message)}};
+['effect','color','brightness','speed'].forEach(id=>$('#'+id).addEventListener('input',updatePreview));$('#effect').onchange=updatePreview;document.querySelectorAll('.preset').forEach(b=>b.onclick=()=>{if(b.dataset.color)$('#color').value=b.dataset.color;if(b.dataset.effect&&[...$('#effect').options].some(o=>o.value===b.dataset.effect))$('#effect').value=b.dataset.effect;updatePreview()});document.querySelectorAll('.nav button').forEach(btn=>btn.onclick=()=>{document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));btn.classList.add('active');document.querySelectorAll('main section').forEach(x=>x.classList.add('hidden'));$('#page-'+btn.dataset.page).classList.remove('hidden')});
+$('#saveProfile').onclick=()=>{const n=$('#profileName').value.trim();if(!n)return;const p=JSON.parse(localStorage.getItem('argbProfiles')||'{}');p[n]={effect:$('#effect').value,color:$('#color').value,brightness:$('#brightness').value,speed:$('#speed').value};localStorage.setItem('argbProfiles',JSON.stringify(p));renderProfiles();log('Perfil salvo: '+n)};function renderProfiles(){const p=JSON.parse(localStorage.getItem('argbProfiles')||'{}');$('#profileList').innerHTML=Object.entries(p).map(([n,v])=>`<div class="device"><div><b>${n}</b><small>${v.effect} • ${v.color} • ${v.brightness}%</small></div><button class="btn" onclick='loadProfile(${JSON.stringify(n)})'>Carregar</button></div>`).join('')||'<p class="hint">Nenhum perfil salvo.</p>'}window.loadProfile=n=>{const p=JSON.parse(localStorage.getItem('argbProfiles')||'{}')[n];if(!p)return;$('#effect').value=p.effect;$('#color').value=p.color;$('#brightness').value=p.brightness;$('#speed').value=p.speed;updatePreview();log('Perfil carregado: '+n)};
+renderProfiles();updatePreview();detect();
+</script></body></html>
