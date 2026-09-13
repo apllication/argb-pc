@@ -1,6 +1,6 @@
 {
   "name": "posto-argb-control",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Posto ARGB Control - MSI MAG B550 TOMAHAWK / JRAINBOW / OpenRGB SDK",
   "main": "main.js",
   "scripts": {"start":"electron .","build":"electron-builder"},

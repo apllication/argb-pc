@@ -80,8 +80,12 @@ function readPacket(socket, wantedId, timeout = 2200) {
 async function sdkRequest(id, dev = 0, data = Buffer.alloc(0), responseId = id) {
   const s = await connect();
   try {
-    s.write(packet(dev, id, data));
-    return await readPacket(s, responseId);
+    // Attach the response listener before sending: OpenRGB can answer immediately.
+    const pending = readPacket(s, responseId);
+    await new Promise((resolve, reject) => {
+      s.write(packet(dev, id, data), err => err ? reject(err) : resolve());
+    });
+    return await pending;
   } finally {
     s.end();
   }
@@ -99,9 +103,9 @@ async function sdkSend(id, dev, data = Buffer.alloc(0)) {
   }
 }
 
-function protocolRequestData() {
+function protocolRequestData(proto) {
   const b = Buffer.alloc(4);
-  b.writeUInt32LE(CLIENT_PROTOCOL, 0);
+  b.writeUInt32LE(proto >>> 0, 0);
   return b;
 }
 
@@ -208,24 +212,30 @@ function parseController(packetBody, proto) {
 }
 
 async function getControllers() {
-  let rawProto = 0;
+  let serverProtocol = 0;
   try {
-    const p = await sdkRequest(40, 0, protocolRequestData(), 40);
-    rawProto = p.length >= 4 ? p.readUInt32LE(0) : 0;
+    // Command 40 has an EMPTY request body.
+    const p = await sdkRequest(40, 0, Buffer.alloc(0), 40);
+    serverProtocol = p.length >= 4 ? p.readUInt32LE(0) : 0;
   } catch (_) {
-    rawProto = 0;
+    // Protocol 0 has no version response.
+    serverProtocol = 0;
   }
-  const proto = Math.min(rawProto || 0, CLIENT_PROTOCOL);
+
+  const protocol = Math.min(serverProtocol || 0, CLIENT_PROTOCOL);
   const countData = await sdkRequest(0, 0, Buffer.alloc(0), 0);
   if (countData.length < 4) throw new Error('Resposta de quantidade de controladores inválida');
   const count = countData.readUInt32LE(0);
+  if (count > 256) throw new Error(`Quantidade de controladores inválida: ${count}`);
+
   const devices = [];
   for (let i = 0; i < count; i++) {
-    const req = proto >= 1 ? protocolRequestData() : Buffer.alloc(0);
+    // Command 1 carries the highest protocol supported by both client/server.
+    const req = protocol >= 1 ? protocolRequestData(protocol) : Buffer.alloc(0);
     const d = await sdkRequest(1, i, req, 1);
-    devices.push({ ...parseController(d, proto), index: i });
+    devices.push({ ...parseController(d, protocol), index: i });
   }
-  return { connected: true, serverProtocol: rawProto, protocol: proto, devices };
+  return { connected: true, serverProtocol, protocol, devices };
 }
 
 function clamp(v, min, max) { return Math.max(min, Math.min(max, Number(v))); }
@@ -317,12 +327,13 @@ function createWindow() {
   const win = new BrowserWindow({
     width: 1320, height: 860, minWidth: 980, minHeight: 680,
     backgroundColor: '#0b0e13',
-    webPreferences: { preload:path.join(__dirname,'preload.js'), contextIsolation:true, nodeIntegration:false }
+    webPreferences: { preload:path.join(__dirname,'preload.js'), contextIsolation:true, nodeIntegration:false, sandbox:false }
   });
   win.loadFile(path.join(__dirname,'index.html'));
 }
 
 app.whenReady().then(createWindow);
 app.on('window-all-closed', () => { if (process.platform !== 'darwin') app.quit(); });
+ipcMain.handle('ping', () => ({ ok:true, app:'Posto ARGB Control', version:'0.3.1' }));
 ipcMain.handle('detect', async () => { try { return await getControllers(); } catch (e) { return { connected:false, devices:[], error:e.message }; } });
 ipcMain.handle('apply', async (_, cfg) => { try { return await apply(cfg || {}); } catch (e) { return { ok:false, error:e.message }; } });
